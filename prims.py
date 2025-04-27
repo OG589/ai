@@ -1,38 +1,41 @@
 import sys
 
-def prim(graph):
-    n=len(graph)
+def prim(graph, n):
     selected = [False] * n
     edge_count = 0
-    selected[0]=True
-    
+    selected[0] = True
     
     print("Edge  \tWeight")
-    while edge_count<n-1:
+    while edge_count < n - 1:
         minimum = sys.maxsize
-        x=0
-        y=0
+        x = 0
+        y = 0
         for i in range(n):
             if selected[i]:
                 for j in range(n):
                     if not selected[j] and graph[i][j]:
-                        if graph[i][j]<minimum:
-                            minimum=graph[i][j]
-                            x=i
-                            y=j
+                        if graph[i][j] < minimum:
+                            minimum = graph[i][j]
+                            x = i
+                            y = j
                             
         print(f"{x}-{y}  \t{graph[x][y]}")
-        selected[y]=True
-        edge_count+=1
-        
-        
-if _name=="main_":
-    graph=[
-        [0, 2, 0, 6, 0],
-    [2, 0, 3, 8, 5],
-    [0, 3, 0, 0, 7],
-    [6, 8, 0, 0, 9],
-    [0, 5, 7, 9, 0]
-        ]
-        
-    prim(graph)
+        selected[y] = True
+        edge_count += 1
+
+def take_user_input():
+    n = int(input("Enter the number of vertices in the graph: "))
+    
+    # Create an adjacency matrix for the graph
+    graph = []
+    print(f"Enter the weights for the {n}x{n} adjacency matrix:")
+    for i in range(n):
+        row = list(map(int, input(f"Enter row {i + 1} (space-separated values): ").strip().split()))
+        graph.append(row)
+    
+    return graph, n
+
+if __name__ == "__main__":
+    graph, n = take_user_input()
+    prim(graph, n)
+
