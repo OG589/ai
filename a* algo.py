@@ -39,76 +39,107 @@ def astar(graph, start, goal, heuristic):
                     heapq.heappush(open_set, (f_score[neighbor], neighbor))
                     open_set_hash.add(neighbor)
     
-    return None  # No path found
+    return None
 
-# Example usage with a grid-based graph
 def grid_to_graph(grid):
     graph = {}
     height, width = len(grid), len(grid[0])
     
     for y in range(height):
         for x in range(width):
-            if grid[y][x] == 1:  # 1 represents a wall
+            if grid[y][x] == 1:
                 continue
                 
             pos = (x, y)
             graph[pos] = {}
             
-            # Check the four adjacent cells
             for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                 nx, ny = x + dx, y + dy
                 
                 if 0 <= nx < width and 0 <= ny < height and grid[ny][nx] != 1:
-                    graph[pos][(nx, ny)] = 1  # Weight of 1 for each step
+                    graph[pos][(nx, ny)] = 1
     
     return graph
 
 def manhattan_distance(a, b):
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
-# Example grid (0 = open, 1 = wall)
-example_grid = [
-    [0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0]
-]
-
-def visualize_path(grid, path):
+def visualize_path(grid, path=None):
+    """Visualizes the grid and optional path."""
+    if path is None:
+        path = []
     visual = []
     for y in range(len(grid)):
         row = ""
         for x in range(len(grid[0])):
-            if (x, y) == path[0]:
+            if path and (x, y) == path[0]:
                 row += "S "  # Start
-            elif (x, y) == path[-1]:
+            elif path and (x, y) == path[-1]:
                 row += "G "  # Goal
-            elif (x, y) in path:
+            elif path and (x, y) in path:
                 row += "* "  # Path
             elif grid[y][x] == 1:
                 row += "# "  # Wall
             else:
-                row += ". "  # Open
+                row += ". "  # Open space
         visual.append(row)
     return visual
 
+def take_user_input():
+    height = int(input("Enter grid height: "))
+    width = int(input("Enter grid width: "))
+    
+    # Initialize grid with open spaces (0)
+    grid = [[0 for _ in range(width)] for _ in range(height)]
+    
+    num_walls = int(input("\nHow many walls do you want to place? "))
+    print(f"\nEnter {num_walls} wall positions (x y) one by one:")
+
+    placed_walls = 0
+    while placed_walls < num_walls:
+        x, y = map(int, input(f"Wall {placed_walls + 1}: ").strip().split())
+        if 0 <= x < width and 0 <= y < height and grid[y][x] == 0:
+            grid[y][x] = 1
+            placed_walls += 1
+        else:
+            print("Invalid position or wall already placed. Try again.")
+    
+    print("\nWalls placed successfully!\n")
+    print("Current Grid:")
+    for row in visualize_path(grid):
+        print(row)
+    
+    while True:
+        start_x, start_y = map(int, input("\nEnter start position (x y): ").strip().split())
+        if 0 <= start_x < width and 0 <= start_y < height and grid[start_y][start_x] == 0:
+            start = (start_x, start_y)
+            break
+        else:
+            print("Invalid start position! It must be inside grid and not on a wall.")
+    
+    while True:
+        goal_x, goal_y = map(int, input("Enter goal position (x y): ").strip().split())
+        if 0 <= goal_x < width and 0 <= goal_y < height and grid[goal_y][goal_x] == 0:
+            goal = (goal_x, goal_y)
+            break
+        else:
+            print("Invalid goal position! It must be inside grid and not on a wall.")
+    
+    return grid, start, goal
+
 if __name__ == "__main__":
-    # Create graph from grid
-    graph = grid_to_graph(example_grid)
+    grid, start, goal = take_user_input()
     
-    # Define start and goal positions
-    start = (0, 0)
-    goal = (4, 4)
+    graph = grid_to_graph(grid)
     
-    # Find path
     path = astar(graph, start, goal, manhattan_distance)
     
     if path:
-        print("Path found:", path)
+        print("\nPath found:", path)
         print("Path length:", len(path) - 1)
-        print("Visualization:")
-        for row in visualize_path(example_grid, path):
+        print("\nVisualization:")
+        for row in visualize_path(grid, path):
             print(row)
     else:
-        print("No path found")
+        print("\nNo path found")
+
