@@ -49,9 +49,12 @@ def print_solutions(solutions, n):
         print()
 
 if __name__ == "__main__":
-    n = 8
+    # Taking input from the user for the number of queens (n)
+    n = int(input("Enter the number of queens: "))
+    
     solutions = solve_n_queens(n)
     print(f"Found {len(solutions)} solutions for {n}-Queens problem.")
     print_solutions(solutions[:3], n)
     if len(solutions) > 3:
         print(f"... and {len(solutions) - 3} more solutions.")
+
