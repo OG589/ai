@@ -1,60 +1,47 @@
-def solve_n_queens(n):
-    def is_safe(board, row, col):
-        for i in range(col):
-            if board[row][i] == 1:
-                return False
-        
-        for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
-            if board[i][j] == 1:
-                return False
-        
-        for i, j in zip(range(row, n), range(col, -1, -1)):
-            if board[i][j] == 1:
-                return False
-            
-        return True
-    
-    def backtrack(board, col, solutions):
-        if col >= n:
-            solution = []
-            for i in range(n):
-                for j in range(n):
-                    if board[i][j] == 1:
-                        solution.append(j)
-            solutions.append(solution)
-            return
-        
-        for row in range(n):
-            if is_safe(board, row, col):
-                board[row][col] = 1
-                backtrack(board, col + 1, solutions)
-                board[row][col] = 0
-    
-    board = [[0 for _ in range(n)] for _ in range(n)]
-    solutions = []
-    backtrack(board, 0, solutions)
-    return solutions
+def is_safe(board, row, col, n):
+    # Check this column on upper side
+    for i in range(row):
+        if board[i][col] == 1:
+            return False
 
-def print_solutions(solutions, n):
-    for i, solution in enumerate(solutions):
-        print(f"Solution {i+1}:")
-        for row in range(n):
-            line = ""
-            for col in range(n):
-                if solution[row] == col:
-                    line += "Q "
-                else:
-                    line += ". "
-            print(line)
+    # Check upper-left diagonal
+    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
+        if board[i][j] == 1:
+            return False
+
+    # Check upper-right diagonal
+    for i, j in zip(range(row, -1, -1), range(col, n)):
+        if board[i][j] == 1:
+            return False
+
+    return True
+
+def solve_n_queens_backtracking(board, row, n):
+    if row == n:
+        # Solution found
+        print_board(board, n)
+        return
+
+    for col in range(n):
+        if is_safe(board, row, col, n):
+            board[row][col] = 1
+            solve_n_queens_backtracking(board, row + 1, n)
+            board[row][col] = 0  # Backtrack
+
+def print_board(board, n):
+    for i in range(n):
+        for j in range(n):
+            print('Q' if board[i][j] else '.', end=' ')
         print()
+    print()
+
+def main():
+    n = int(input("Enter the number of queens: "))
+    board = [[0 for _ in range(n)] for _ in range(n)]
+    print("\nSolutions using Backtracking:\n")
+    solve_n_queens_backtracking(board, 0, n)
 
 if __name__ == "__main__":
-    # Taking input from the user for the number of queens (n)
-    n = int(input("Enter the number of queens: "))
-    
-    solutions = solve_n_queens(n)
-    print(f"Found {len(solutions)} solutions for {n}-Queens problem.")
-    print_solutions(solutions[:3], n)
-    if len(solutions) > 3:
-        print(f"... and {len(solutions) - 3} more solutions.")
+    main()
+
 
